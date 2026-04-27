@@ -25,14 +25,29 @@ Ensure you are using Python 3.10+. It is highly recommended to build within a cl
 3. `pip install -r requirements.txt`
 
 ### API Key
-This project uses the Anthropic Claude API.
-Set your key before running:
-    export ANTHROPIC_API_KEY=your_key_here
-Model used: claude-sonnet-4-5-20250929
+The evaluator supports both direct Anthropic and OpenAI-compatible endpoints (e.g., Tinker).
+
+Anthropic:
+```bash
+export LLM_PROVIDER=anthropic
+export ANTHROPIC_API_KEY=your_key_here
+export LLM_MODEL=your_model_id_here
+```
+
+Tinker / OpenAI-compatible:
+```bash
+export LLM_PROVIDER=tinker
+export TINKER_API_KEY=your_tinker_key_here
+export TINKER_BASE_URL=your_tinker_base_url_here   # e.g. https://<your-host>/v1
+export LLM_MODEL=your_model_id_here
+```
 
 ## Running the Benchmark
 ### Run full evaluation (with LLM)
 python run_eval.py
+
+### Run low-cost mode (1 trial)
+python run_eval.py --trials 1
 
 ### Run without LLM (baselines only)
 python run_eval.py --no-llm
