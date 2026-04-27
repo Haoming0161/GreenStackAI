@@ -81,6 +81,16 @@ The custom framework mimics sequential refinement implementing the generic seque
 - **Regression rate**: Negative VIS variations breaking application stability natively.
 
 ## Results
-| Task | System | CorrRate | Speedup% | RAMred% | VIS |
-|:-----|:-------|:---------|:---------|:--------|:----|
-| ...  | ...    | ...      | ...      | ...     | ... |
+The latest committed one-trial run outputs are tracked in:
+- `results/results.csv` (per-task, per-system records)
+- `results/summary.csv` (aggregated by task/system)
+
+Overall system-level means across all 10 tasks:
+
+| System | Correctness (%) | Mean Speedup (%) | Mean RAM Reduction (%) | Mean VIS | Regression Rate (%) |
+|:-------|-----------------:|-----------------:|-----------------------:|---------:|--------------------:|
+| Baseline Slow | 100 | 0.00 | 0.00 | 0.00 | 0 |
+| Static Rule | 100 | 25.58 | 0.06 | 18.32 | 10 |
+| Single-Shot LLM | 10 | 19.88 | 0.00 | 13.92 | 0 |
+| One-Pass Profile | 90 | -45.77 | 12.49 | 45.98 | 10 |
+| Critic-Refiner Agent | 90 | 64.78 | 22.42 | 52.07 | 0 |

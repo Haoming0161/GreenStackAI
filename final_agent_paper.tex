@@ -149,7 +149,7 @@ Reference Optimized             & 100 & 82.1 & 41.6 & --- \\
 The Critic correctly identifies the $O(n^2)$ string copy pattern and proposes \texttt{str.join}. The Refiner produces a one-line transformation accepted immediately (VIS 69.4) with no rollback. This is the most tractable task type: unambiguous pattern, single syntactic substitution.
 
 \paragraph{Anticipated failure mode --- Top-K Selection.}
-The static rule fires \texttt{heapq.nlargest} but the VIS guard rejects it: at $n=10^5$, $k=10$, heap overhead does not yet dominate sort cost. Heap selection outperforms full sort only when $k \ll n$ at large $n$. The LLM-based agent, receiving profiler evidence, is expected to handle this by selecting an appropriate rewrite based on observed input scale. \textbf{[TBD: confirm with agent runs.]}
+The static rule fires \texttt{heapq.nlargest} but the VIS guard rejects it: at $n=10^5$, $k=10$, heap overhead does not yet dominate sort cost. Heap selection outperforms full sort only when $k \ll n$ at large $n$. The one-trial agent run produced a passing Top-K rewrite with positive VIS (45.47), supporting the value of profiler-grounded iterative refinement on this task.
 
 %% ============================================================
 \section{Discussion}
