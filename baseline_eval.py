@@ -21,7 +21,7 @@ def generate_memo_data():
     return [25, 28, 30, 32, 35]
 
 
-def codex_duplicate_detection(input_data):
+def duplicate_detection(input_data):
     seen_items = set()
     duplicates = set()
     for item in input_data:
@@ -32,7 +32,7 @@ def codex_duplicate_detection(input_data):
     return list(duplicates)
 
 
-def codex_nested_loop_join(input_data):
+def nested_loop_join(input_data):
     left_records, right_records = input_data
     right_index = {}
     for right_key, right_value in right_records:
@@ -45,7 +45,7 @@ def codex_nested_loop_join(input_data):
     return joined_results
 
 
-def codex_memoization(input_data):
+def memoization(input_data):
     cache = {0: 0, 1: 1}
 
     def fib(n):
@@ -73,20 +73,20 @@ def speedup_pct(baseline_duration, candidate_duration):
 def main():
     harness = PerformanceEngine()
     rows = [
-        ("Duplicate Detection", DuplicateDetectionTask().slow_version, generate_duplicate_data(), codex_duplicate_detection),
-        ("Nested-Loop Join", NestedLoopJoinTask().slow_version, generate_join_data(), codex_nested_loop_join),
-        ("Memoization", MemoizationTask().slow_version, generate_memo_data(), codex_memoization),
+        ("Duplicate Detection", DuplicateDetectionTask().slow_version, generate_duplicate_data(), duplicate_detection),
+        ("Nested-Loop Join", NestedLoopJoinTask().slow_version, generate_join_data(), nested_loop_join),
+        ("Memoization", MemoizationTask().slow_version, generate_memo_data(), memoization),
     ]
 
     print(f"{'Task':<22} | {'Speedup %':>10} | {'Correct %':>9}")
     print("-" * 50)
-    for task_name, slow_fn, input_data, codex_fn in rows:
+    for task_name, slow_fn, input_data, candidate_fn in rows:
         baseline_metrics = harness.get_median_metrics(slow_fn, input_data)
-        codex_metrics = harness.get_median_metrics(codex_fn, input_data)
-        correct = is_correct(baseline_metrics["result"], codex_metrics["result"])
+        candidate_metrics = harness.get_median_metrics(candidate_fn, input_data)
+        correct = is_correct(baseline_metrics["result"], candidate_metrics["result"])
         speedup = speedup_pct(
             baseline_metrics["median_duration_seconds"],
-            codex_metrics["median_duration_seconds"],
+            candidate_metrics["median_duration_seconds"],
         )
         print(f"{task_name:<22} | {speedup:>10.1f} | {100.0 if correct else 0.0:>9.1f}")
 
