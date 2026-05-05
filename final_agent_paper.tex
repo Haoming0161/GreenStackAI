@@ -23,7 +23,7 @@ Paper under double-blind review
 \maketitle
 
 \begin{abstract}
-We present the \textbf{Green-Code Refactoring Agent}, a Critic--Refiner system that autonomously identifies and eliminates computational inefficiencies in Python programs. The agent operates in a closed ReAct loop: a Critic interprets profiler outputs to diagnose bottlenecks and propose algorithmic changes; a Refiner generates targeted rewrites; a Controller validates correctness via PyTest and re-profiles to accept or roll back each candidate. We evaluate the agent on GreenPyBench, our 10-task Python optimization benchmark, against three baselines: a static rule rewriter, a single-shot LLM rewrite, and a one-pass profile-guided rewrite. All LLM-based systems use a shared Tinker-routed QWEN configuration (\texttt{Qwen/Qwen3-30B-A3B-Instruct-2507}) for fairness. In the reported one-trial run, the agent achieves 90\% correctness across tasks while retaining the strongest overall VIS among LLM-based methods.
+We present the \textbf{Green-Code Refactoring Agent}, a Critic--Refiner system that autonomously identifies and eliminates computational inefficiencies in Python programs. The agent operates in a closed ReAct loop: a Critic interprets profiler outputs to diagnose bottlenecks and propose algorithmic changes; a Refiner generates targeted rewrites; a Controller validates correctness via PyTest and re-profiles to accept or roll back each candidate. We evaluate the agent on GreenPyBench, our 10-task Python optimization benchmark, against three baselines: a static rule rewriter, a single-shot LLM rewrite, and a one-pass profile-guided rewrite. All LLM-based systems use a shared Tinker-routed QWEN configuration (\texttt{Qwen/Qwen3-30B-A3B-Instruct-2507}) for fairness. With 3 trials per LLM condition, the agent remains the strongest iterative method by aggregate VIS while exposing high-variance edge cases that are invisible in one-trial reporting.
 \end{abstract}
 
 %% ============================================================
@@ -102,7 +102,7 @@ Plus: correctness pass rate (hard gate), runtime speedup (\%), peak RAM reductio
 
 \begin{table}[h]
 \centering
-\caption{Aggregate GreenPyBench results from a one-trial run. RT = mean runtime speedup, RAM = mean RAM reduction (passing tasks only). VIS = mean across all 10 tasks.}
+\caption{Aggregate GreenPyBench results from 3-trial evaluation. RT = mean runtime speedup, RAM = mean RAM reduction (passing tasks only). VIS = mean across all 10 tasks.}
 \label{tab:results}
 \small
 \begin{tabular}{lcccc}
@@ -111,9 +111,9 @@ Plus: correctness pass rate (hard gate), runtime speedup (\%), peak RAM reductio
 \midrule
 Baseline Slow                   & 100 & 0.0  & 0.0  & 0.00 \\
 Static Rule                     & 100 & 25.6 & 0.1  & 18.32 \\
-Single-Shot LLM                 & 10  & 19.9  & 0.0  & 13.92 \\
-One-Pass Profile-Guided         & 90  & -45.8 & 12.5 & 45.98 \\
-\textbf{Critic--Refiner (ours)} & 90  & 64.8  & 22.4 & 52.07 \\
+Single-Shot LLM                 & 10  & 19.8  & 0.0  & 13.87 \\
+One-Pass Profile-Guided         & 90  & -42.9 & 12.5 & 45.95 \\
+\textbf{Critic--Refiner (ours)} & 90  & 64.7  & 22.4 & 51.64 \\
 Reference Optimized             & 100 & 82.1 & 41.6 & --- \\
 \bottomrule
 \end{tabular}
@@ -123,23 +123,23 @@ Reference Optimized             & 100 & 82.1 & 41.6 & --- \\
 
 \begin{table}[h]
 \centering
-\caption{Per-task results. Static rule and agent columns are from the same one-trial evaluation run.}
+\caption{Per-task Critic--Refiner results (3 trials, mean $\pm$ sample std across trials).}
 \label{tab:pertask}
 \small
-\begin{tabular}{llccc}
+\begin{tabular}{llcc}
 \toprule
-\textbf{\#} & \textbf{Task} & \textbf{Static RT (\%)} & \textbf{Static VIS} & \textbf{Agent VIS} \\
+\textbf{\#} & \textbf{Task} & \textbf{Agent RT (\%)} & \textbf{Agent VIS} \\
 \midrule
-1  & Duplicate Detection   & -5.60 & 0.00  & 69.95 \\
-2  & Linear Search         & 0.0   & 0.00  & 68.04 \\
-3  & Loop Aggregation      & 62.86 & 44.00 & 21.10 \\
-4  & Top-K Selection       & 0.0   & 0.00  & 45.47 \\
-5  & Nested-Loop Join      & 0.0   & 0.00  & 68.07 \\
-6  & String Concatenation  & 98.57 & 69.19 & 67.77 \\
-7  & Redundant List        & 0.0   & 0.00  & 33.49 \\
-8  & Memoization           & 100.0 & 70.00 & 77.28 \\
-9  & Data Structure Choice & 0.0   & 0.00  & 69.57 \\
-10 & Multi-Pass Reduction  & 0.0   & 0.00  & 0.00 \\
+1  & Duplicate Detection   & 99.89 $\pm$ 0.08 & 69.92 $\pm$ 0.06 \\
+2  & Linear Search         & 97.21 $\pm$ 0.09 & 68.04 $\pm$ 0.06 \\
+3  & Loop Aggregation      & 30.27 $\pm$ 0.59 & 21.19 $\pm$ 0.41 \\
+4  & Top-K Selection       & 22.27 $\pm$ 1.08 & 45.36 $\pm$ 0.76 \\
+5  & Nested-Loop Join      & 97.23 $\pm$ 0.32 & 68.06 $\pm$ 0.22 \\
+6  & String Concatenation  & 96.55 $\pm$ 0.13 & 67.78 $\pm$ 0.09 \\
+7  & Redundant List        & 4.60 $\pm$ 4.22  & 33.22 $\pm$ 2.95 \\
+8  & Memoization           & 100.00 $\pm$ 0.00 & 77.28 $\pm$ 0.00 \\
+9  & Data Structure Choice & 99.37 $\pm$ 0.16 & 69.56 $\pm$ 0.11 \\
+10 & Multi-Pass Reduction  & 0.00 $\pm$ 0.00  & 0.00 $\pm$ 0.00 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -147,8 +147,11 @@ Reference Optimized             & 100 & 82.1 & 41.6 & --- \\
 \paragraph{Success case --- String Concatenation.}
 The Critic correctly identifies the $O(n^2)$ string copy pattern and proposes \texttt{str.join}. The Refiner produces a one-line transformation accepted immediately (VIS 69.4) with no rollback. This is the most tractable task type: unambiguous pattern, single syntactic substitution.
 
-\paragraph{Anticipated failure mode --- Top-K Selection.}
-The static rule fires \texttt{heapq.nlargest} but the VIS guard rejects it: at $n=10^5$, $k=10$, heap overhead does not yet dominate sort cost. Heap selection outperforms full sort only when $k \ll n$ at large $n$. The one-trial agent run produced a passing Top-K rewrite with positive VIS (45.47), supporting the value of profiler-grounded iterative refinement on this task.
+\paragraph{Variance and stability across trials.}
+The 3-trial results confirm that most tasks are stable for the agent (e.g., Memoization VIS $77.28\pm0.00$, Duplicate Detection VIS $69.92\pm0.06$), but Task 7 (Redundant List / generator-style memory streaming) is notably noisy at VIS $33.22\pm2.95$ and runtime speedup $4.60\%\pm4.22$. This justifies multi-trial reporting and explains why one-trial summaries can overstate confidence on medium-difficulty memory tasks.
+
+\paragraph{Task 10 failure trace (Multi-Pass Reduction, VIS 0).}
+\textbf{Critic diagnosis:} profiler detected three full traversals over the same array and proposed algebraic fusion into one pass using running sum and sum-of-squares with deferred standard-deviation computation. \textbf{Refiner output:} generated a fused loop but introduced a numerically fragile update order and an unnecessary temporary accumulator that preserved asymptotic work while increasing interpreter overhead; measured speedups remained exactly 0.0\% across all three trials. \textbf{Rollback outcome:} correctness passed, but the acceptance gate (strict VIS improvement over incumbent) was never satisfied, so the Controller retained the incumbent implementation each round. This exposes an architectural limit: when rewrites require both algebraic equivalence reasoning and low-level numerical-stability choices, profile-guided natural-language planning alone may be insufficient without symbolic rewrite constraints.
 
 %% ============================================================
 \section{Discussion}
@@ -167,12 +170,12 @@ The agent handles single-function snippets only; multi-file refactoring is out o
 \section{Conclusion}
 %% ============================================================
 
-The Green-Code Refactoring Agent demonstrates that a Critic--Refiner ReAct loop with structured JSON prompting, profiling-grounded diagnosis, and rollback-controlled acceptance provides a principled approach to automated Python efficiency optimization. In one-trial evaluation, the agent outperforms other LLM baselines in overall VIS and mean runtime speedup while matching one-pass correctness (90\%). Future work should expand to multi-trial runs for lower-variance reporting.
+The Green-Code Refactoring Agent demonstrates that a Critic--Refiner ReAct loop with structured JSON prompting, profiling-grounded diagnosis, and rollback-controlled acceptance provides a principled approach to automated Python efficiency optimization. In 3-trial evaluation, the agent preserves high correctness (90\%), strong aggregate VIS, and clear wins on high-payoff tasks while exposing variance-sensitive and algebraically difficult failure modes that motivate additional safeguards beyond profile-only feedback.
 
 Future work includes multi-function refactoring, RAPL-based energy measurement (joules per run), and evaluation on real-world scientific codebases beyond the controlled benchmark setting.
 
 \paragraph{Changelog.}
-Final version adds confirmed one-trial LLM and agent results in Tables~\ref{tab:results}--\ref{tab:pertask}, expands the two-measurement rollback guard discussion from Project Update 2~\cite{update2}, incorporates evaluation fairness clarifications from Project Update 3~\cite{update3}, and updates the implementation to support Tinker-compatible LLM endpoints.
+Final version replaces one-trial claims with 3-trial LLM/agent aggregates, adds per-task mean$\pm$std reporting for the agent, introduces an explicit diagnostic trace for the Task 10 Multi-Pass Reduction failure (Critic$\rightarrow$Refiner$\rightarrow$rollback), and retains fairness/rollback clarifications from Project Updates 2--3~\cite{update2,update3}.
 
 %% ============================================================
 \begin{thebibliography}{14}
